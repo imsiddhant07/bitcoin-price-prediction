@@ -1,85 +1,47 @@
-"""Copyright 2017 Google, Inc. All Rights Reserved.
+# Siddhant Jain
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+# !pip install tensorflow==1.4
 
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-----
-Original script can be found at
-
-    https://github.com/dandelionmane/tf-dev-summit-tensorboard-tutorial
-
-And is similar to the TensorFlow tutorial script found at
-
-    https://www.tensorflow.org/get_started/mnist/mechanics
-"""
 import tqdm
+import numpy
 import os
 import tensorflow as tf
+
+print(tf.__version__)
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-tf.logging.set_verbosity(tf.logging.ERROR)
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 #
-#  Script variables. Change these and observe
-#  how results change.
+# Hyper-Parameters
 #
 LEARNING_RATE = 0.0001
 EPOCHS = 2000
 
-#
-#  Script constants. Here we pull data available
-#  locally. The data contains both the sprites
-#  and the labels from the original MNIST dataset.
-#
-LOGDIR = "mnist_example/"
-LABELS = os.path.join(os.getcwd(), "data/labels_1024.tsv")
-SPRITES = os.path.join(os.getcwd(), "data/sprite_1024.png")
 
+#
+# Taking in data
+# 
+LOG_DIR = 'mnist/'
+LABELS = os.path.join(os.getcwd(), 'Dataset1/labels_1024.tsv')
+SPRITES = os.path.join(os.getcwd(), 'Dataset1/sprite_1024.png')
 
 def load_data():
-    """Load data form the MNIST dataset into memory.
-
-    Returns
-    -------
-    TensorFlow object with dataset.
-    """
     if not (os.path.isfile(LABELS) and os.path.isfile(SPRITES)):
         raise ValueError("""
-            Necessary data files were not found. Make sure the files
-
-                * labels_1024.tsv
-                * sprite_1024.png
-
-            are available in the same location where you run this script.
-            """)
+            Required data files not found,
+            expected:
+            * labels_1024.tsv
+            * sprite_1024.png
+            not found.
+    """)
 
     return tf.contrib.learn.datasets.mnist.read_data_sets(
         train_dir=LOGDIR + "data", one_hot=True)
 
 
 def convolutional_layer(input, size_in, size_out, name="convolutional"):
-    """Convoluted layer.
 
-    Create the weights and biases distributions.
-    Also define the convolution and the activation function (ReLU).
-    Finally, we create some histogram summaries useful for TensorBoard.
-
-    Parameters
-    ----------
-    size_in, size_out: int or float
-        Where to truncate the normal distribution.
-
-    name: str
-        Name to give the TensorFlow scope.
-    """
     with tf.name_scope(name):
 
         W = tf.Variable(tf.truncated_normal([5, 5, size_in, size_out], stddev=0.1), name="Weights")
@@ -96,23 +58,7 @@ def convolutional_layer(input, size_in, size_out, name="convolutional"):
 
 
 def fully_connected_layer(input, size_in, size_out, name="fully_connected"):
-    """Fully connected layer.
 
-    This defines the fully connected layer.
-    Different from the convolution layer, this layer does not
-    perform a convolution but only defines an activation function.
-    That function is also different from the convolution layer
-    by multipliying the input data with its weights plus the biases,
-    which is a much simpler activation function than ReLU.
-
-    Parameters
-    ----------
-    size_in, size_out: int or float
-        Where to truncate the normal distribution.
-
-    name: str
-        Name to give the TensorFlow scope.
-    """
     with tf.name_scope(name):
         W = tf.Variable(tf.truncated_normal([size_in, size_out], stddev=0.1), name="Weights")
         B = tf.Variable(tf.constant(0.1, shape=[size_out]), name="Biases")
@@ -127,20 +73,7 @@ def fully_connected_layer(input, size_in, size_out, name="fully_connected"):
 
 
 def model(mnist, learning_rate, epochs=2000):
-    """Neural network model used in the MNIST dataset.
 
-    Parameters
-    ----------
-    mnist: TensorFlow dataset object
-        MNIST dataset loaded using TensorFlow.
-
-    learning_rate: float
-        Learning rate at which the network should
-        create momentum.
-
-    epochs: int, default 2000
-        Number of epochs to train the model with.
-    """
     name = "MNIST-model/lr={}-epochs={}".format(learning_rate, epochs)
 
     tf.reset_default_graph()
@@ -243,10 +176,7 @@ def model(mnist, learning_rate, epochs=2000):
 
 
 def main():
-    """Main runner function.
 
-    This calls the model function.
-    """
     print("""
     Running MNIST model with:
 
