@@ -1,6 +1,6 @@
 # bitcoin-price-prediction
 
-**This is done in some defined steps:
+**This is done in some defined steps:**
 
 1.Configuring a Deep Learning Environment
 
